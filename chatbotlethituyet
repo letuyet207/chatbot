@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<title>Chatbot Hỗ Trợ Sinh Viên</title>
+
+<style>
+
+body{
+margin:0;
+font-family:Arial;
+background:#f4f6fb;
+display:flex;
+height:100vh;
+}
+
+.sidebar{
+width:250px;
+background:#ff4fa3;
+color:white;
+padding:20px;
+}
+
+.sidebar h3{
+margin-top:0;
+}
+
+.suggest{
+background:white;
+color:#333;
+padding:8px;
+margin:8px 0;
+border-radius:6px;
+cursor:pointer;
+}
+
+.suggest:hover{
+background:#ffe3f3;
+}
+
+.chat-area{
+flex:1;
+display:flex;
+flex-direction:column;
+}
+
+.header{
+background:white;
+padding:15px;
+border-bottom:1px solid #ddd;
+font-weight:bold;
+}
+
+.chat-box{
+flex:1;
+padding:20px;
+overflow-y:auto;
+}
+
+.msg{
+margin:10px 0;
+display:flex;
+flex-direction:column;
+}
+
+.user{
+align-items:flex-end;
+}
+
+.bot{
+align-items:flex-start;
+}
+
+.bubble{
+padding:10px 14px;
+border-radius:15px;
+max-width:60%;
+}
+
+.user .bubble{
+background:#ff4fa3;
+color:white;
+}
+
+.bot .bubble{
+background:#e4e6eb;
+}
+
+.input-area{
+display:flex;
+border-top:1px solid #ddd;
+}
+
+input{
+flex:1;
+border:none;
+padding:12px;
+font-size:14px;
+outline:none;
+}
+
+button{
+background:#ff4fa3;
+color:white;
+border:none;
+padding:0 18px;
+cursor:pointer;
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="sidebar">
+
+<h3>Gợi ý câu hỏi</h3>
+
+<div class="suggest" onclick="quick('Lịch học xem ở đâu')">Lịch học</div>
+<div class="suggest" onclick="quick('Học lại phải đóng bao nhiêu tiền')">Học lại</div>
+<div class="suggest" onclick="quick('Bao nhiêu tín chỉ thì tốt nghiệp')">Tốt nghiệp</div>
+<div class="suggest" onclick="quick('Điểm bao nhiêu thì qua môn')">Qua môn</div>
+<div class="suggest" onclick="quick('Làm sao đăng ký môn học')">Đăng ký môn</div>
+
+</div>
+
+<div class="chat-area">
+
+<div class="header">
+🤖 Chatbot Hỗ Trợ Sinh Viên
+</div>
+
+<div class="chat-box" id="chat"></div>
+
+<div class="input-area">
+<input id="input" placeholder="Hỏi gì đó..." onkeypress="enterSend(event)">
+<button onclick="send()">Gửi</button>
+</div>
+
+</div>
+
+<script>
+
+function add(text,type){
+
+let chat=document.getElementById("chat")
+
+let msg=document.createElement("div")
+msg.className="msg "+type
+
+let bubble=document.createElement("div")
+bubble.className="bubble"
+bubble.innerText=text
+
+msg.appendChild(bubble)
+
+chat.appendChild(msg)
+
+chat.scrollTop=chat.scrollHeight
+
+}
+
+function answer(q){
+
+q=q.toLowerCase()
+
+let data=[
+
+["lịch học","Bạn có thể xem lịch học trên cổng thông tin sinh viên của trường."],
+
+["lịch thi","Lịch thi được đăng trên cổng thông tin sinh viên."],
+
+["học kỳ","Thời gian học kỳ được nhà trường thông báo trên website."],
+
+["học lại","Sinh viên phải đóng học phí theo số tín chỉ của môn học lại."],
+
+["qua môn","Sinh viên cần đạt từ 4.0 trở lên để qua môn."],
+
+["rớt môn","Bạn cần đăng ký học lại môn đó."],
+
+["thi lại","Lịch thi lại sẽ được nhà trường thông báo."],
+
+["bảo lưu","Sinh viên có thể bảo lưu kết quả học tập nếu đủ điều kiện."],
+
+["tín chỉ","Tín chỉ là đơn vị đo khối lượng học tập của sinh viên."],
+
+["điều kiện học môn","Sinh viên cần hoàn thành môn học trước đó theo yêu cầu của chương trình đào tạo."],
+
+["đăng ký môn","Bạn đăng ký môn học trên hệ thống đăng ký học phần."],
+
+["bao nhiêu môn","Sinh viên thường học 4 đến 7 môn mỗi học kỳ."],
+
+["học phí","Bạn có thể đóng học phí qua ngân hàng hoặc online."],
+
+["giấy xác nhận","Bạn xin tại phòng công tác sinh viên."],
+
+["tốt nghiệp","Bạn cần hoàn thành khoảng 120 đến 140 tín chỉ để tốt nghiệp."],
+
+["học vượt","Sinh viên có thể học vượt nếu đủ điều kiện."],
+
+["hỗ trợ","Bạn liên hệ phòng công tác sinh viên để được hỗ trợ."]
+
+]
+
+for(let i=0;i<data.length;i++){
+if(q.includes(data[i][0]))
+return data[i][1]
+}
+
+return "Xin lỗi, tôi chưa hiểu câu hỏi. Bạn hãy hỏi về lịch học, học phí, tín chỉ hoặc môn học."
+
+}
+
+function send(){
+
+let input=document.getElementById("input")
+let text=input.value.trim()
+
+if(text==="") return
+
+add(text,"user")
+
+setTimeout(()=>{
+add(answer(text),"bot")
+},500)
+
+input.value=""
+
+}
+
+function enterSend(e){
+if(e.key==="Enter")
+send()
+}
+
+function quick(q){
+document.getElementById("input").value=q
+send()
+}
+
+window.onload=function(){
+add("Xin chào 👋 Tôi là chatbot hỗ trợ sinh viên. Bạn cần hỏi gì?","bot")
+}
+
+</script>
+
+</body>
+</html>
